@@ -15,7 +15,7 @@ api_server = "api.ipeye.ru"
 api_port = 8111
 api_timeout = 2
 
-timelapsTimer = 30 # частота запуска скрипта планировщиком в минутах
+timeLapseTimer = 30 # частота запуска скрипта планировщиком в минутах
 timeZoneDelta = -4 # Разница в часовых поясах
 
 cams_json = '{"cam1": {"name": "Camera1", "uuid": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}, "cam2": {"name": "Camera2", "uuid": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}}'
@@ -157,8 +157,10 @@ def makeVideoFile(name):
 		# Зачем ресайзить, если мы взяли до этого изображение из FullHD потока? Что бы была возможность добавить в видео изображение полученное через API
 		heightOrig, widthOrig, channelsOrig = origImage.shape
 		if height != heightOrig or width != widthOrig:
-			img = cv2.resize(origImage, (width, height)) 
-		video.write(img)
+			img = cv2.resize(origImage, (width, height))
+			video.write(img)
+		else:
+			video.write(origImage)
 	cv2.destroyAllWindows()
 	video.release()
 	
@@ -188,6 +190,7 @@ if getServerStatus() == 0:
 for key, cam in cams.items():
 	if checkStreamStatus(cam["uuid"], cam["name"]):
 		saveJpegFromRTSP(cam["name"], getStreamRTSP(cam["uuid"], cam["name"]))
+
 	else:
 		saveJpegFromCache(cam["uuid"], cam["name"])
 
@@ -200,7 +203,7 @@ tomorrow = (today + timedelta(days = 1)).replace(hour = 0, minute = 0, second = 
 today_ts = time.mktime(today.timetuple())
 tomorrow_ts = time.mktime(tomorrow.timetuple())
 
-if int(tomorrow_ts - today_ts) / 60 < timelapsTimer:
+if int(tomorrow_ts - today_ts) / 60 < timeLapseTimer:
 	writeLog("Making video files")
 	for key, cam in cams.items():
 		makeVideoFile(cam["name"])
