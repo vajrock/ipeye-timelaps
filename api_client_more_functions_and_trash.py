@@ -184,7 +184,6 @@ def saveJpegFromRTSP(name, rtspLink):
 			cv2.imwrite(filename, frame)
 			writeLog("File saved as: " + filename)
 			return True
-
 	else:
 		writeLog("Can't read RTSP stream")
 		return False
@@ -234,8 +233,10 @@ def makeVideoFile(name):
 		# Зачем ресайзить, если мы взяли до этого изображение из FullHD потока? Что бы была возможность добавить в видео изображение полученное через API
 		heightOrig, widthOrig, channelsOrig = origImage.shape
 		if height != heightOrig or width != widthOrig:
-			img = cv2.resize(origImage, (width, height)) 
-		video.write(img)
+			img = cv2.resize(origImage, (width, height))
+			video.write(img)
+		else:
+			video.write(origImage)
 	cv2.destroyAllWindows()
 	video.release()
 	
